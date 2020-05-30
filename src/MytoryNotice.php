@@ -12,6 +12,8 @@ class MytoryNotice {
 		add_action( 'init', [ $this, 'registerPostType' ] );
 		add_action( 'admin_init', [ $this, 'boardCapabilities' ] );
 		add_action( "save_post_{$this->postTypeKey}", [ $this, 'updateMeta' ], 10, 3 );
+		add_action( "add_meta_boxes", [ $this, 'addMetaBoxes' ] );
+		add_action( "admin_enqueue_scripts", [ $this, 'adminEnqueueScripts' ] );
 	}
 
 	public function registerPostType() {
@@ -77,20 +79,30 @@ class MytoryNotice {
 	}
 
 	/**
-	 * <code><input name="meta[_mytory_board_custom_key]"></code>로 값을 넘기면 postmeta에 저장한다.
-	 * <code>mytory_board</code>는 당연히 <code>$taxonomyKey</code>로 대체해야 한다.
+	 * <code><input name="meta[_postTypeKey_customKey]"></code>로 값을 넘기면 postmeta에 저장한다.
 	 *
 	 * @param          $post_id
 	 * @param \WP_Post $post
 	 * @param          $is_update
 	 */
-	function updateMeta( $post_id, \WP_Post $post, $is_update ) {
+	public function updateMeta( $post_id, \WP_Post $post, $is_update ) {
 		if ( ! empty( $_POST['meta'] ) ) {
 			foreach ( $_POST['meta'] as $k => $v ) {
-				if ( strpos( $k, "_{$this->taxonomyKey}_" ) === 0 ) {
-					update_post_meta( $post_id, $k, $v );
-				}
+				update_post_meta( $post_id, $k, $v );
 			}
+		}
+	}
+
+	public function addMetaBoxes() {
+		add_meta_box('detail', '상세', function () {
+			include 'detail.php';
+		}, $this->postTypeKey);
+	}
+
+	public function adminEnqueueScripts() {
+		if (get_current_screen()->id === $this->postTypeKey) {
+			wp_enqueue_script('jquery-ui-datepicker');
+			wp_enqueue_style('jquery-ui-theme', 'https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css');
 		}
 	}
 }
