@@ -14,6 +14,8 @@ class MytoryNotice {
 		add_action( "save_post_{$this->postTypeKey}", [ $this, 'updateMeta' ], 10, 3 );
 		add_action( "add_meta_boxes", [ $this, 'addMetaBoxes' ] );
 		add_action( "admin_enqueue_scripts", [ $this, 'adminEnqueueScripts' ] );
+		add_filter( "manage_{$this->postTypeKey}_posts_columns", [ $this, 'managePostsColumns' ] );
+		add_filter( "manage_{$this->postTypeKey}_posts_custom_column", [ $this, 'manageCustomColumn' ], 10, 2 );
 	}
 
 	public function registerPostType() {
@@ -94,15 +96,35 @@ class MytoryNotice {
 	}
 
 	public function addMetaBoxes() {
-		add_meta_box('detail', '상세', function () {
+		add_meta_box( 'detail', '상세', function () {
 			include 'detail.php';
-		}, $this->postTypeKey);
+		}, $this->postTypeKey );
 	}
 
 	public function adminEnqueueScripts() {
-		if (get_current_screen()->id === $this->postTypeKey) {
-			wp_enqueue_script('jquery-ui-datepicker');
-			wp_enqueue_style('jquery-ui-theme', 'https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css');
+		if ( get_current_screen()->id === $this->postTypeKey ) {
+			wp_enqueue_script( 'jquery-ui-datepicker' );
+			wp_enqueue_style( 'jquery-ui-theme', 'https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css' );
+		}
+	}
+
+	public function managePostsColumns($columns) {
+		return [
+			'title' => __( 'title' ),
+			'링크' => '링크',
+			'기간' => '기간',
+			'date' => __('Date'),
+		];
+	}
+
+	public function manageCustomColumn($column, $post_id) {
+		switch ($column) {
+			case '링크':
+				echo get_post_meta($post_id, 'link', true);
+				break;
+			case '기간':
+				echo get_post_meta($post_id, 'from', true) . '~' . get_post_meta($post_id, 'to', true);
+				break;
 		}
 	}
 }
