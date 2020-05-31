@@ -2,7 +2,7 @@
     "name": "mytory/wp-mytory-notice",
     "description": "워드프레스에 '메인 이미지 위 공지' Custom Post Type을 추가해 준다.",
     "type": "library",
-    "version": "1.0",
+    "version": "1.0.1",
     "authors": [
         {
             "name": "An, Hyeong-woo",
