@@ -2,6 +2,8 @@
 
 namespace Mytory\Notice;
 
+use WP_Query;
+
 class MytoryNotice {
 	private $postTypeLabel;
 	private $postTypeKey;
@@ -127,4 +129,34 @@ class MytoryNotice {
 				break;
 		}
 	}
+
+	function first() {
+		$the_query = new WP_Query( array(
+			'meta_query'     => array(
+				array(
+					'key'     => 'from',
+					'value'   => date( 'Y-m-d' ),
+					'compare' => '<='
+				),
+				array(
+					'relation' => 'OR',
+					array(
+						'key'     => 'to',
+						'value'   => date( 'Y-m-d' ),
+						'compare' => '>='
+					),
+					array(
+						'key'     => 'to',
+						'value'   => '',
+						'compare' => '='
+					),
+				),
+			),
+			'post_type'      => $this->postTypeKey,
+			'posts_per_page' => 1,
+		) );
+
+		return $the_query;
+	}
+
 }
