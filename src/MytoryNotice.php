@@ -54,6 +54,7 @@ class MytoryNotice {
 				'read_private_posts'     => "read_private_{$this->postTypeKey}",
 			],
 			'map_meta_cap'  => true,
+			'menu_icon' => 'dashicons-megaphone',
 		];
 
 		register_post_type( $this->postTypeKey, $args );
